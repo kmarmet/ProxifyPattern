@@ -11,6 +11,7 @@ const log = (message) => {
   console.log(message);
 };
 
+// Worker classes -> only cares about its own job
 class PlayPause {
   constructor() {
     this.playbackState = "pause";
@@ -29,7 +30,6 @@ class PlayPause {
   }
   clickEvents() {
     find(".play-pause").on("click", (e) => {
-      log("here");
       this.toggle();
     });
   }
@@ -50,7 +50,7 @@ class PlayPause {
 }
 class Clock {
   constructor() {
-    this.time = moment().format("hh:mm:ss");
+    this.time = moment().format("hh:mm:ss A");
     this.direction = "forward";
     this.speedMultiplier = 1;
     this.timeouts = [];
@@ -96,13 +96,13 @@ class Clock {
     let timer = null;
     function updateTime() {
       if (proxy_Clock.direction === "forward") {
-        proxy_Clock.time = moment(proxy_Clock.time, "hh:mm:ss")
+        proxy_Clock.time = moment(proxy_Clock.time, "hh:mm:ss A")
           .add(1, "s")
-          .format("hh:mm:ss");
+          .format("hh:mm:ss A");
       } else {
-        proxy_Clock.time = moment(proxy_Clock.time, "hh:mm:ss")
+        proxy_Clock.time = moment(proxy_Clock.time, "hh:mm:ss A")
           .subtract(1, "s")
-          .format("hh:mm:ss");
+          .format("hh:mm:ss A");
       }
     }
     if (counter === 0) {
@@ -137,7 +137,9 @@ class Timepicker {
   }
   clickEvents() {
     find(".go").click(() => {
-      proxy_Clock.time = moment($("input").val(), "HH:mm A").format("hh:mm:00");
+      proxy_Clock.time = moment($("input").val(), "HH:mm A").format(
+        "hh:mm:00 A"
+      );
       proxy_PlayPause.playbackState = "play";
     });
   }
@@ -185,7 +187,7 @@ const sentry_Clock = {
       }
       return target[prop];
     } else {
-      throw `Prop ${prop} is invalid.`;
+      throw `Prop '${prop}' is invalid.`;
     }
   },
   set: function (target, prop, value) {
